@@ -1,6 +1,6 @@
 streamlit==1.40.1
 requests
-wordcloud==1.9.2
+wordcloud==1.9.4
 matplotlib==3.8.0
 pandas==2.1.1
 nltk==3.8.1

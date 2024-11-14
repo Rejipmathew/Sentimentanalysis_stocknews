@@ -43,7 +43,7 @@ def generate_wordcloud(text):
 
 # Streamlit app
 def main():
-    st.title("Stock News Sentiment Analysis")
+    st.title("Stock News Sentiment Analysis-Yahoo RSS Feed")
 
     # User input for ticker symbol
     ticker = st.text_input("Enter a ticker symbol (e.g., GOOGL, AAPL, MSFT):", value="GOOGL").upper()

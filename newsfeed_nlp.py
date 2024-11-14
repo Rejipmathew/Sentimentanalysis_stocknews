@@ -1,5 +1,6 @@
 import streamlit as st
-import feedparser
+import requests
+import xml.etree.ElementTree as ET
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
@@ -12,11 +13,23 @@ nltk.download('vader_lexicon')
 # Initialize VADER Sentiment Analyzer
 analyzer = SentimentIntensityAnalyzer()
 
-# Function to fetch and parse RSS feed
+# Function to fetch and parse RSS feed using requests and xml.etree.ElementTree
 def fetch_rss_feed(ticker):
     # URL format for Yahoo Finance RSS feed
     feed_url = f"https://finance.yahoo.com/rss/headline?s={ticker}"
-    feed = feedparser.parse(feed_url)
+    response = requests.get(feed_url)
+    root = ET.fromstring(response.content)
+    
+    feed = []
+    for item in root.findall('./channel/item'):
+        title = item.find('title').text
+        link = item.find('link').text
+        published = item.find('pubDate').text
+        feed.append({
+            'title': title,
+            'link': link,
+            'published': published
+        })
     return feed
 
 # Function to perform sentiment analysis using VADER
@@ -52,7 +65,7 @@ def main():
         with st.spinner("Fetching news..."):
             feed = fetch_rss_feed(ticker)
             
-            if feed.entries:
+            if feed:
                 # Collect headlines for word cloud generation and separate lists for sentiment categories
                 all_headlines = ""
                 positive_news = []
@@ -60,10 +73,10 @@ def main():
                 negative_news = []
 
                 # Loop through each news entry and perform sentiment analysis
-                for entry in feed.entries:
-                    title = entry.title
-                    link = entry.link
-                    published = entry.published
+                for entry in feed:
+                    title = entry['title']
+                    link = entry['link']
+                    published = entry['published']
                     
                     # Concatenate titles for the word cloud
                     all_headlines += f"{title} "
